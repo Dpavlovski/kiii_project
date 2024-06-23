@@ -26,7 +26,7 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Build Docker backend
-      run: docker build --tag ${{ secrets.DOCKER_USERNAME }}/requests:${{ env.TAG }} . 
+      run: docker build --tag ${{ secrets.DOCKER_USERNAME }}/requests:${{ env.TAG }} 
 
     - name: Push Docker image
       run: docker push ${{ secrets.DOCKER_USERNAME }}/requests:${{ env.TAG }}
