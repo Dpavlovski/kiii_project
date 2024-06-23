@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="mk">
+<head>
+    <meta charset="UTF-8">
+    <title>LCE Email Template</title>
+</head>
+<body>
+<p th:text="'Почитуван, ' + ${professor} + '!'"></p>
+<p th:text="'Студентот со индекс ' + ${index} + ' ви има испратено нова молба.'"></p>
+<p th:text="'Тип: молба за задоцнето запишување на курс'"></p>
+<p th:text="'Курс: ' + ${course}"></p>
+<p>Поздрав.</p>
+</body>
+</html>

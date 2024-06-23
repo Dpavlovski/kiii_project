@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="mk" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" xmlns="http://www.w3.org/1999/html">
+<head>
+    <title>Листа на молби за конкретен студент</title>
+    <style>
+        .zoom-on-hover:hover {
+            transform: scale(1.1);
+            transition: transform 0.3s ease;
+            filter: brightness(1.2);
+            cursor: pointer;
+        }
+
+        tbody tr {
+            transition: box-shadow 0.3s;
+        }
+
+        tbody tr:hover {
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+    </style>
+    <script>
+        $(document).ready(function () {
+
+            $("#requestType").change(function () {
+                $("#filterForm").submit();
+            });
+
+
+            $(".delete-it").click(function () {
+                let id = $(this).data('id');
+                bootbox.confirm({
+                    message: "Дали сте сигурни дека сакате да ја избришете вашата молба?",
+                    buttons: {
+                        confirm: {
+                            label: 'Да',
+                            className: 'btn-danger'
+                        },
+                        cancel: {
+                            label: 'Не',
+                            className: 'btn-secondary'
+                        }
+                    },
+                    callback: function (result) {
+                        if (result) {
+                            let form = document.forms["deleteForm-" + id];
+                            form.submit()
+                        }
+                    }
+                });
+            });
+
+            $('[data-bs-target="#detailsModal"]').click(function () {
+                let id = $(this).data('id');
+                $.ajax({
+                    url: `/student/details/${id}`,
+                    method: 'GET',
+                    success: function (data) {
+                        $('#detailsId').text(data.id || '');
+                        $('#detailsType').text(data.requestSession ? data.requestSession.requestType ? data.requestSession.requestType : '' : 'N/A');
+                        $('#detailsDate').text(data.dateCreated || '');
+                        $('#detailsDescription').val(data.description || '');
+                        $('#rowRejectionReason').hide();
+                        $('#rowDateProcessed').hide();
+
+                        $('#detailsStatus').removeClass('text-success text-danger text-warning').text('');
+
+                        if (data.isApproved && !data.isProcessed) {
+                            $('#detailsStatus').text('Одобрено').addClass('text-success');
+                        } else if (data.isApproved === false) {
+                            $('#detailsStatus').text('Одбиено').addClass('text-danger');
+                            $('#rowRejectionReason').show();
+                            $('#detailsRejectionReason').val(data.rejectionReason || '');
+
+                        } else if (data.isProcessed) {
+                            $('#detailsStatus').text('Процесирано').addClass('text-success');
+                            $('#rowDateProcessed').show()
+                            $('#detailsDateProcessed').text(data.dateProcessed);
+
+                        } else {
+                            $('#detailsStatus').text('Во процес...').addClass('text-warning');
+                        }
+
+                        $('#rowCourse, #rowProfessor, #rowProfessorApproved, #rowInstallmentsNum, #rowCurrentProfessor, #rowNewProfessor, #rowNewStudyProgram, #rowOldStudyProgram').hide();
+
+                        switch (data.requestSession.requestType) {
+                            case 'LATE_COURSE_ENROLLMENT':
+                                $('#detailsCourse').text(data.course && data.course.joinedSubject ? data.course.joinedSubject.name : '');
+                                $('#detailsProfessor').text(data.professor ? data.professor.name : '');
+                                $('#detailsProfessorApproved').text(data.professorApproved ? "Одобрено" : '');
+                                $('#rowCourse, #rowProfessor, #rowProfessorApproved').show();
+                                break;
+                            case 'INSTALLMENT_PAYMENT':
+                                $('#detailsInstallmentsNum').text(data.installmentsNum || '');
+                                $('#rowInstallmentsNum').show();
+                                break;
+                            case 'STUDY_PROGRAM_CHANGE':
+                                $('#detailsNewStudyProgram').text(data.newStudyProgram.code ? data.newStudyProgram.code : '');
+                                $('#detailsOldStudyProgram').text(data.oldStudyProgram.code ? data.oldStudyProgram.code : '');
+                                $('#rowNewStudyProgram, #rowOldStudyProgram').show();
+                                break;
+                            case 'COURSE_GROUP_CHANGE':
+                                $('#detailsCourse').text(data.course && data.course.joinedSubject ? data.course.joinedSubject.name : '');
+                                $('#detailsCurrentProfessor').text(data.currentProfessor ? data.currentProfessor.name : '');
+                                $('#detailsNewProfessor').text(data.newProfessor ? data.newProfessor.name : '');
+                                $('#rowCourse, #rowCurrentProfessor, #rowNewProfessor').show();
+                                break;
+                            case 'COURSE_ENROLLMENT_WITHOUT_REQUIREMENTS':
+                                $('#detailsCourse').text(data.course && data.course.joinedSubject ? data.course.joinedSubject.name : '');
+                                $('#rowCourse').show();
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    ,
+                    error: function (err) {
+                        console.log(err);
+                    }
+                });
+            })
+            ;
+        });
+    </script>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row">
+        <div class="col-1 mt-4"><a href="/student" class="btn btn-secondary">Назад</a></div>
+        <div class="col-11"><h1 class="my-4">Листа на моите молби</h1></div>
+    </div>
+    <section class="bg-light">
+        <form id="filterForm" th:method="GET" th:action="@{'/student/my_requests'}">
+            <div class="row my-3">
+                <div class="col-3">
+                    <label for="requestType" class="form-label">Tип на молба:</label>
+                    <select id="requestType" name="requestType" class="form-control">
+                        <option value="">сите типови</option>
+                        <option th:each="type : ${requestTypes}"
+                                th:value="${type}"
+                                th:selected="${param.requestType != null and param.requestType[0].equals(type.toString())}"
+                                th:text="${type}">
+                        </option>
+                    </select>
+                </div>
+            </div>
+        </form>
+    </section>
+
+    <table class="table table-striped table-bordered">
+        <thead>
+        <tr>
+            <th>ИД</th>
+            <th>Тип</th>
+            <th>Поднесена на</th>
+            <th>Опис</th>
+            <th>Статус</th>
+            <th>Процесирана на</th>
+            <th>Акција</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="request : ${page}">
+            <td th:text="${request.id}"></td>
+            <td th:text="${request.requestSession.requestType}"></td>
+            <td th:text="${request.dateCreated}"></td>
+            <td th:text="${request.description}"></td>
+            <td>
+                <span class="text-warning"
+                      th:if="${request.isApproved == null}">Во процес...</span>
+                <span class="text-success"
+                      th:if="${request.isApproved != null and request.isApproved and !request.isProcessed}">Одобрено</span>
+                <span class="text-danger" th:if="${request.isApproved != null and !request.isApproved}">Одбиено</span>
+                <span class="text-success"
+                      th:if="${request.isProcessed != null and request.isProcessed}">Процесирано</span>
+            </td>
+            <td th:text="${request.dateProcessed}"></td>
+            <td style="width: 150px;">
+                <div class="btn-group" role="group" style="gap: 10px;">
+
+                    <button data-bs-toggle="modal" th:data-id="${request.id}" data-bs-target="#detailsModal"
+                            class="btn btn-secondary details-button">
+                        Детали
+                    </button>
+                    <form id="editForm"
+                          th:action="@{'/student/{requestType}/edit/{id}' (requestType=${request.requestSession.getRequestType()}, id=${request.id})}"
+                          th:method="GET">
+                        <button type="submit" class="btn btn-link p-0" th:disabled="${request.isApproved != null}"
+                                th:title="${request.isApproved != null ? 'Молбата е веќе прегледана' : ''}">
+                            <img src="/edit.png"
+                                 style="width:20px; height:20px; opacity: 0.7; cursor: pointer; transition: transform 0.2s;"
+                                 alt="Edit"
+                                 th:title="${request.isApproved != null ? 'Молбата е веќе прегледана' : ''}">
+                        </button>
+                    </form>
+                    <form th:id="'deleteForm-' + ${request.id}" th:action="@{'/student/delete/{id}' (id=${request.id})}"
+                          th:method="POST">
+                        <button type="button" class="btn btn-link p-0" th:disabled="${request.isApproved != null}">
+                            <img src="/delete.png"
+                                 style="width:20px; height:20px; opacity: 0.7; cursor: pointer; transition: transform 0.2s;"
+                                 alt="Delete"
+                                 class="zoom-on-hover delete-it" th:data-id="${request.id}"
+                                 th:title="${request.isApproved != null ? 'Молбата е веќе прегледана' : ''}">
+                        </button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div th:include="fragments/paging :: pageSection(${page})"></div>
+
+    <div class="modal" id="detailsModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Детали за молбата</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered table-striped">
+                        <tr>
+                            <th>ИД:</th>
+                            <td id="detailsId"></td>
+                        </tr>
+                        <tr>
+                            <th>Тип:</th>
+                            <td id="detailsType"></td>
+                        </tr>
+                        <tr>
+                            <th>Поднесена на:</th>
+                            <td id="detailsDate"></td>
+                        </tr>
+                        <tr>
+                            <th>Опис:</th>
+                            <td>
+                                <label for="detailsDescription"></label>
+                                <textarea id="detailsDescription" disabled></textarea>
+                            </td>
+                        </tr>
+                        <tr id="rowCourse">
+                            <th>Курс:</th>
+                            <td id="detailsCourse"></td>
+                        </tr>
+                        <tr id="rowProfessor">
+                            <th>Професор:</th>
+                            <td id="detailsProfessor"></td>
+                        </tr>
+                        <tr id="rowProfessorApproved">
+                            <th>Одобрено од професор:</th>
+                            <td id="detailsProfessorApproved"></td>
+                        </tr>
+                        <tr id="rowInstallmentsNum">
+                            <th>Бр. на рати:</th>
+                            <td id="detailsInstallmentsNum"></td>
+                        </tr>
+                        <tr id="rowCurrentProfessor">
+                            <th>Моментален професор:</th>
+                            <td id="detailsCurrentProfessor"></td>
+                        </tr>
+                        <tr id="rowNewProfessor">
+                            <th>Нов професор:</th>
+                            <td id="detailsNewProfessor"></td>
+                        </tr>
+                        <tr id="rowOldStudyProgram">
+                            <th>Стара студиска програма:</th>
+                            <td id="detailsOldStudyProgram"></td>
+                        </tr>
+                        <tr id="rowNewStudyProgram">
+                            <th>Нова студиска програма:</th>
+                            <td id="detailsNewStudyProgram"></td>
+                        </tr>
+                        <tr id="rowStatus">
+                            <th>Статус:</th>
+                            <td id="detailsStatus"></td>
+                        </tr>
+                        <tr id="rowDateProcessed">
+                            <th>Процесирана на:</th>
+                            <td id="detailsDateProcessed"></td>
+                        </tr>
+                        <tr id="rowRejectionReason">
+                            <th class="text-danger">Причина за одбивање:</th>
+                            <td>
+                                <label for="detailsRejectionReason"></label>
+                                <textarea id="detailsRejectionReason" disabled></textarea>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Затвори</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

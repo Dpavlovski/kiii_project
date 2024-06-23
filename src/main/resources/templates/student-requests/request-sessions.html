@@ -1,0 +1,69 @@
+<!DOCTYPE html >
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="/bootstrap.css" rel="stylesheet">
+    <style>
+        .selected-card {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .card:hover {
+            background-color: #f8f9fa;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        .card.selected-card:hover {
+            background-color: #007bff;
+            color: white;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container mb-4 mt-4" layout:fragment="content">
+    <div class="row">
+        <div th:if="${page == null}" class="col-12">
+            <div class="alert alert-info" role="alert">
+                Во моментов нема достапни сесии за молба.
+            </div>
+        </div>
+
+        <div th:if="${page != null}" th:each="requestSession : ${page}" class="col-sm-6 mb-3">
+            <div class="card" style="max-width: 100%;">
+                <div class="card-body p-4">
+                    <h5 class="card-title" th:text="${requestSession.requestType}"></h5>
+                    <h6 class="card-subtitle mb-2 text-muted" th:text="${requestSession.semester.code}"></h6>
+                    <p class="card-text"
+                       style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;"
+                       th:text="${requestSession.description}"></p>
+                    <div class="d-flex justify-content-end">
+                        <form th:action="@{'/student/' + ${requestSession.requestType} + '/apply'}" method="get">
+                            <input type="hidden" name="sessionId" th:value="${requestSession.id}"/>
+                            <button type="submit" class="btn btn-primary">Поднеси</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $('.card').on('click', function () {
+            $(this).toggleClass('selected-card');
+        });
+    });
+</script>
+
+
+</body>
+</html>

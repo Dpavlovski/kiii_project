@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="mk" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Листа на моите молби</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row">
+        <div class="col-11"><h1 class="my-4">Листа на моите молби</h1></div>
+    </div>
+    <table class="table table-striped table-bordered">
+        <thead>
+        <tr>
+            <th>ИД</th>
+            <th>Тип</th>
+            <th>Датум на поднесување</th>
+            <th>Студент</th>
+            <th>Професор</th>
+            <th>Курс</th>
+            <th>Опис</th>
+            <th>Одобрена од професор</th>
+            <th>Статус</th>
+            <th>Процесирана</th>
+            <th>Датум на процесирање</th>
+            <th>Акција</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="request : ${page}">
+            <td th:text="${request.id}" id="requestId"></td>
+            <td>Молба за задоцнето запишување на курс</td>
+            <td th:text="${request.dateCreated}" id="requestDate"></td>
+            <td th:text="${request.student.index}" id="requestStudent"></td>
+            <td th:text="${request.professor.name}" id="requestProfessor"></td>
+            <td th:text="${request.course.joinedSubject.name}" id="requestCourse"></td>
+            <td th:text="${request.description}" id="requestDescription"></td>
+            <td>
+                <span class="text-success"
+                      th:if="${request.professorApproved != null and request.professorApproved}">✔️</span>
+                <span class="text-danger"
+                      th:if="${request.professorApproved != null and !request.professorApproved}">❌</span>
+            </td>
+            <td>
+                <span class="text-success"
+                      th:if="${request.isApproved != null and request.isApproved}">Одобрено</span>
+                <span class="text-danger"
+                      th:if="${request.isApproved != null and !request.isApproved}">Одбиено</span>
+                <div th:if="${request.isApproved != null and !request.isApproved}" class="mt-3">
+                    <button data-bs-toggle="modal" data-bs-target="#detailsModal"
+                            class="btn btn-outline-secondary">Детали
+                    </button>
+                </div>
+            </td>
+            <td>
+                <span class="text-success"
+                      th:if="${request.isProcessed!= null and request.isProcessed}">✔️</span>
+                <span class="text-danger" th:if="${request.isProcessed != null and !request.isProcessed}">❌</span>
+            </td>
+            <td th:text="${request.dateProcessed}"></td>
+            <td sec:authorize="hasRole('PROFESSOR')">
+                <form th:method="POST"
+                      th:action="@{'/professor/professorApprove/{id}'(id=${request.id})}">
+                    <button th:disabled="${request.isProcessed}" class="btn btn-success">Одобри</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div th:include="fragments/paging :: pageSection(${page})"></div>
+</div>
+</body>
+</html>

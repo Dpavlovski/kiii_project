@@ -1,0 +1,133 @@
+table.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #e1f5fe;
+}
+
+table.table-striped tbody tr:nth-of-type(even) {
+    background-color: white;
+}
+
+/* Adjust font size for table cells */
+table.table-bordered td,
+table.table-bordered th {
+    font-size: 15px; /* Adjust the value as needed */
+}
+
+/* Reduce padding for table cells */
+table.table-bordered td,
+table.table-bordered th {
+    padding: 4px 7px; /* Adjust the padding values as needed */
+}
+
+/* Reduce line height for table cells */
+table.table-bordered td,
+table.table-bordered th {
+    line-height: 1.2; /* Adjust the line height as needed */
+}
+
+
+h1 {
+    text-align: center;
+    color: #004c6c;
+}
+
+.button-placeholder {
+    height: 30px;
+}
+
+
+.filter-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.filter-form {
+    display: flex;
+    align-items: center;
+}
+
+.filter-form label {
+    margin-right: 99px;
+}
+
+.radio-group {
+    display: flex;
+    align-items: center;
+    margin-right: 127px;
+}
+
+.form-control {
+    width: 275px;
+    display: initial;
+    margin-top: 5px;
+}
+
+.filter-form select {
+    width: 270px;
+    margin-right: 10px;
+}
+
+.filter-form button {
+    font-size: 14px;
+    margin-right: 10px;
+}
+
+.reset-filter-button {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+    width: 94px;
+}
+
+.reset-filter-button:hover {
+    background-color: #545b62;
+    border-color: #4e555b;
+}
+
+.filter-form label {
+    margin-right: 30px;
+}
+
+.radio-group {
+    display: flex;
+    align-items: center;
+    margin-right: -35px; /* Adjusted from 127px */
+}
+
+.radio-group input[type="radio"] {
+    margin-right: 5px; /* Reduced space between radio buttons */
+}
+
+.btn.btn-primary.btn-sm {
+    background-color: #01375e;
+    border-color: #4e555b;
+    height: 34px;
+    width: 187px;
+    margin-left: 8px;
+    font-size: 16px;
+}
+
+.btn.btn-primary.btn-sm.filter {
+    background-color: #01375e;
+    border-color: #4e555b;
+    height: 36px;
+    margin-top: 4px;
+    margin-left: 2px;
+    width: 267px;
+    font-size: 16px;
+}
+
+.btn.btn-primary.btn-sm:hover {
+    background-color: #ffffff;
+    border-color: #ffffff;
+    color: #1a1d20;
+
+    font-size: 16px;
+
+}

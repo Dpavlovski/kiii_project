@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml" lang="mk">
+<head>
+    <title></title>
+
+</head>
+<body>
+<header class="p-3" th:fragment="header" style="
+background-color: #787878;">
+
+    <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+        <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
+            <img class="mx-3" src="/io.png" style="width: 40px;" alt="logo"/>
+        </a>
+
+        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+            <div sec:authorize="hasRole('STUDENT')">
+                <div class="nav-item d-inline-flex">
+                    <a class="text-white nav-link" href="/student" role="button">Молби</a>
+                    <a class="text-white nav-link ml-2" href="/student/my_requests" role="button">Мои молби</a>
+                </div>
+            </div>
+            <div sec:authorize="hasRole('PROFESSOR')">
+                <div class="nav-item">
+                    <a class="text-white nav-link" href="/professor" role="button">Молби</a>
+                </div>
+            </div>
+            <div sec:authorize="hasAnyRole('DEAN', 'ACADEMIC_AFFAIR_VICE_DEAN',
+                                'FINANCES_VICE_DEAN',
+                                'SCIENCE_AND_COOPERATION_VICE_DEAN', 'STUDENT_ADMINISTRATION',
+                                'STUDENT_ADMINISTRATION_MANAGER', 'ADMINISTRATION_MANAGER')">
+                <div class="nav-item">
+                    <a class="text-white nav-link" href="/admin" role="button">Молби</a>
+                </div>
+            </div>
+        </ul>
+
+        <div th:if="${username}" class="ml-auto d-flex align-items-baseline">
+            <img class="mr-2" src="/user.png" alt="" style="height: 16px; width:16px;"/>
+            <strong th:text="${username}" class="text-white text-xl"> </strong>
+            <i class="fas fa-user ml-2"></i>
+        </div>
+
+    </div>
+
+</header>
+</body>
+</html>
