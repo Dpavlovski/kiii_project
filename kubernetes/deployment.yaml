@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: requests-deployment
+  namespace: requests
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: requests-app
+  template:
+    metadata:
+      labels:
+        app: requests-app
+    spec:
+      containers:
+        - name: requests
+          image: dimitarpavlovski/requests:latest
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: requests-config
+          env:
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: requests-secret
+                  key: SPRING_DATASOURCE_PASSWORD

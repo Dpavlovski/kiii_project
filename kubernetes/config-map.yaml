@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: requests-config
+  namespace: requests
+data:
+  SPRING_PROFILES_ACTIVE: "development"
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://requests-postgres-service:5432/finki-services-db"
+  SPRING_DATASOURCE_USERNAME: "finki_admin"
+

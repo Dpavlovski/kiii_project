@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: requests-postgres-secret
+  namespace: requests
+type: Opaque
+data:
+  password: ZjFuazFfQGRtMW4=
